@@ -1,30 +1,19 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted } from 'vue'
+import { useTrainingGuide } from './composables/useTrainingGuide.js'
+import CharacterGrid from './components/CharacterGrid.vue'
+import DetailPanel from './components/DetailPanel.vue'
+
+const { loadFromStorage } = useTrainingGuide()
+
+// Restore saved state from localStorage when the app first loads
+onMounted(() => loadFromStorage())
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <!-- Full-viewport dark layout: fixed-width left grid, flexible right panel -->
+  <div class="flex h-screen overflow-hidden bg-genshin-bg text-genshin-text">
+    <CharacterGrid />
+    <DetailPanel class="flex-1 min-w-0" />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
-
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
