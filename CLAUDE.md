@@ -15,25 +15,29 @@ Allow players to track levelling progress for any number of characters simultane
 - **Vue 3** (Composition API)
 - **Vite** (build tool)
 - **Tailwind CSS v4** (styling — uses `@theme {}` in `style.css`, NO `tailwind.config.js`)
-- **genshin-db** (npm package by theBowja — provides character/weapon/talent game data)
+- **genshin-db** v5.2.8 (npm package by theBowja — provides character/weapon/talent game data)
 - No backend — persistence via browser `localStorage`
 
-## Current State (as of 2026-02-15)
+## Current State (as of 2026-02-19)
 
-The core app is fully built and working (committed on branch `main`). All five build phases are complete:
+The core app is fully built and working. All five build phases plus a quick-wins sprint are complete.
 
 ### What's done
 - Dark Genshin-themed two-column layout (left: character grid, right: detail panel)
 - Character roster with **ownership toggle mode** — all ~80 characters available (Traveler excluded by design), user marks owned characters, non-owned are hidden when toggle is off
+- **Character search** in ownership mode — search bar filters the grid by name
 - Per-character goal settings persisted to `localStorage`, lazily created on first selection
-- **Character Level tab** — level range selector, shows combined Mora + Hero's Wits + all ascension materials
-- **Weapon tab** — weapon selector filtered to character's weapon type, ascension costs + Mystic Enhancement Ores
-- **Artifacts tab** — 5 slots with milestone level dropdowns (+0/+4/+8/+12/+16/+20), Mora cost per slot + total
-- **Talents tab** — 3 talent sections with real in-game talent names, independent level ranges 1–10, materials per talent
-- All state auto-saved to `localStorage` on every change
+- **Character Level tab** — preset dropdown selectors with ascension phase labels (A1–A6), shows combined Mora + Hero's Wits + all ascension materials
+- **Weapon tab** — weapon selector filtered to character's weapon type, weapon icon displayed when selected, ascension costs + Mystic Enhancement Ores
+- **Artifacts tab** — 5 slots with milestone level dropdowns (+0/+4/+8/+12/+16/+20), Mora + EXP cost per slot + totals
+- **Talents tab** — 3 collapsible talent sections with real in-game talent names, independent level ranges 1–10, materials per talent, allows current=target
+- **Character portrait images** from Enka.Network CDN with element-coloured letter fallback
+- **Material icons** from Enka.Network CDN with letter fallback
+- All state auto-saved to `localStorage` on every change (loaded at module init to avoid race conditions)
 
-### What's NOT done yet (planned Phase 6)
-- Character portrait images (currently coloured letter placeholders)
+### What's NOT done yet
+- Green "complete" indicator for talents/sections that have reached their target
+- Artifact substats — target main stat and substat tracking (GitHub issue #6)
 - JSON export/import button in the UI (the functions `exportData()` / `importData()` are already written in `useTrainingGuide.js`, just need a UI trigger)
 - Cross-character total material summary (aggregate Mora + shared materials across all tracked characters)
 - Material inventory tracking (what the user currently owns) — intentionally deferred
@@ -44,21 +48,21 @@ The core app is fully built and working (committed on branch `main`). All five b
 src/
 ├── main.js
 ├── style.css                          # Tailwind import + @theme colour tokens
-├── App.vue                            # Root: two-column layout, calls loadFromStorage()
+├── App.vue                            # Root: two-column layout
 ├── composables/
 │   └── useTrainingGuide.js            # ALL reactive state + localStorage sync + export/import
 ├── data/
-│   ├── genshinData.js                 # genshin-db wrapper (memoised queries)
-│   └── levelTables.js                 # Hardcoded XP/Mora cost tables (genshin-db doesn't provide these)
+│   ├── genshinData.js                 # genshin-db wrapper (memoised queries) + Enka CDN icon URLs
+│   └── levelTables.js                 # Hardcoded XP/Mora cost tables (character, weapon, artifact)
 └── components/
-    ├── CharacterCard.vue              # Single portrait tile (coloured placeholder + name + level badge)
-    ├── CharacterGrid.vue              # Left column: scrollable grid, ownership mode logic
+    ├── CharacterCard.vue              # Single portrait tile (CDN image + name + level badge)
+    ├── CharacterGrid.vue              # Left column: scrollable grid, ownership mode, search
     ├── DetailHeader.vue               # Character name + element colour dot
     ├── DetailPanel.vue                # Right column: placeholder or header+tabs+content
     ├── TabBar.vue                     # Four-tab navigation (v-model)
     ├── shared/
-    │   ├── MaterialRow.vue            # Single material cost row (icon + name + count)
-    │   ├── LevelRangeInput.vue        # Reusable current→target level selector
+    │   ├── MaterialRow.vue            # Single material cost row (CDN icon + name + count)
+    │   ├── LevelRangeInput.vue        # Reusable current→target dropdown selector
     │   └── OwnershipToggle.vue        # Edit roster / Done editing button
     └── tabs/
         ├── CharacterLevelTab.vue
@@ -69,11 +73,14 @@ src/
 
 ## Key Architecture Decisions
 
-- **State**: Single `reactive({})` object at module level in `useTrainingGuide.js` — all components share the same instance (Vue's global state pattern without Pinia). `watch(state, ..., { deep: true })` handles all localStorage persistence.
+- **State**: Single `reactive({})` object at module level in `useTrainingGuide.js` — all components share the same instance (Vue's global state pattern without Pinia). `watch(state, ..., { deep: true })` handles all localStorage persistence. State is loaded synchronously at module init (not in `onMounted`) to prevent race conditions with immediate watchers.
 - **genshin-db queries**: All wrapped in `src/data/genshinData.js` with memo caches. Talent costs are at `t.costs.lvl2–lvl10` (shared for all three talents of a character — same books/boss drops regardless of which talent).
-- **Level tables**: Hardcoded cumulative EXP values in `levelTables.js` for character levels (1→20→40→50→60→70→80→90) and weapon levels. Mora from levelling = EXP × 0.2 for characters, EXP × 0.005 for weapons.
+- **Icon CDN**: All game asset icons (characters, weapons, materials) served from Enka.Network (`https://enka.network/ui/{filename_icon}.png`). The MiHoYo CDN URLs in genshin-db are stale for newer content. All icons have `@error` fallbacks to letter placeholders.
+- **Level tables**: Hardcoded cumulative EXP values in `levelTables.js` for character levels (1→20→40→50→60→70→80→90), weapon levels, and artifact levels. Mora from levelling = EXP × 0.2 for characters, EXP × 0.005 for weapons.
+- **Level selectors**: All use `<select>` dropdowns (not free-text inputs) constrained to valid game milestones. `LevelRangeInput` accepts `currentOptions`, `targetOptions`, optional `currentLabels` for ascension phases, and `allowEqual` for talent sections.
 - **Traveler excluded**: Aether and Lumine are filtered out in `getAllCharacterNames()` — their multi-element talent structure doesn't fit the standard 3-talent model.
 - **localStorage key**: `'genshin-training-guide-v1'` — bump to v2 if the state schema changes.
+- **genshin-db limitations**: v5.2.8 doesn't include weapons/characters from game version 5.3+. Missing items get letter-placeholder fallbacks.
 
 ## Data & Persistence
 
