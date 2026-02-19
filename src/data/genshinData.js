@@ -188,18 +188,23 @@ export function getTalentCosts(charName, currentLevel, targetLevel) {
   return costs
 }
 
-/**
- * Returns the MiHoYo CDN icon URL for a character, or null if unavailable.
- */
-export function getCharacterIconUrl(charName) {
-  return getCharacter(charName)?.images?.mihoyo_icon ?? null
+// ──────────────────────────────────────────────────────────
+// Icon URLs (Enka.Network CDN — reliable for all characters/weapons/materials)
+// ──────────────────────────────────────────────────────────
+
+/** Builds a full Enka.Network CDN URL from a genshin-db filename_icon field. */
+function enkaUrl(filenameIcon) {
+  return filenameIcon ? `https://enka.network/ui/${filenameIcon}.png` : null
 }
 
-/**
- * Returns the MiHoYo CDN icon URL for a weapon, or null if unavailable.
- */
+/** Returns the Enka.Network icon URL for a character, or null if unavailable. */
+export function getCharacterIconUrl(charName) {
+  return enkaUrl(getCharacter(charName)?.images?.filename_icon)
+}
+
+/** Returns the Enka.Network icon URL for a weapon, or null if unavailable. */
 export function getWeaponIconUrl(weaponName) {
-  return getWeapon(weaponName)?.images?.mihoyo_icon ?? null
+  return enkaUrl(getWeapon(weaponName)?.images?.filename_icon)
 }
 
 // ──────────────────────────────────────────────────────────
@@ -209,17 +214,13 @@ export function getWeaponIconUrl(weaponName) {
 const _materialCache = {}
 
 /**
- * Returns an icon URL for a material.
- * genshin-db materials only provide `filename_icon` (no full URL),
- * so we construct a URL using the Enka.Network CDN which hosts game assets.
+ * Returns the Enka.Network icon URL for a material, or null if unavailable.
+ * Queries genshin-db materials with a memo cache.
  */
 export function getMaterialIconUrl(materialName) {
   if (_materialCache[materialName] === undefined) {
     const mat = genshindb.materials(materialName)
-    const filename = mat?.images?.filename_icon
-    _materialCache[materialName] = filename
-      ? `https://enka.network/ui/${filename}.png`
-      : null
+    _materialCache[materialName] = enkaUrl(mat?.images?.filename_icon)
   }
   return _materialCache[materialName]
 }

@@ -102,6 +102,11 @@ function loadFromStorage() {
   }
 }
 
+// Load saved state immediately at module init (before any watchers in
+// components can mutate state and trigger the auto-save watcher below).
+// localStorage is synchronous so this is safe to do at import time.
+loadFromStorage()
+
 // Auto-save whenever state changes.
 // { deep: true } watches nested objects (goals, artifacts, talents, etc.)
 watch(state, () => {

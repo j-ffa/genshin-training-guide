@@ -1,13 +1,6 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useTrainingGuide } from './composables/useTrainingGuide.js'
 import CharacterGrid from './components/CharacterGrid.vue'
 import DetailPanel from './components/DetailPanel.vue'
-
-const { loadFromStorage } = useTrainingGuide()
-
-// Restore saved state from localStorage when the app first loads
-onMounted(() => loadFromStorage())
 </script>
 
 <template>
