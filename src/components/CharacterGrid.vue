@@ -16,9 +16,9 @@
  * ownership mode so the user can build their roster straight away.
  */
 
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useTrainingGuide } from '../composables/useTrainingGuide.js'
-import { getAllCharacterNames } from '../data/genshinData.js'
+import { getAllCharacterNames, getCharacterIconUrl } from '../data/genshinData.js'
 import genshindb from 'genshin-db'
 import CharacterCard from './CharacterCard.vue'
 import OwnershipToggle from './shared/OwnershipToggle.vue'
@@ -28,13 +28,22 @@ const { state, selectCharacter, toggleOwnership } = useTrainingGuide()
 // All characters from genshin-db (Traveler excluded)
 const allCharacters = getAllCharacterNames()
 
-// Fetch element type for each character for coloured placeholder portraits
-// We use a simple cache object rather than calling genshindb per-render
+// Fetch element type and icon URL for each character (cached, not per-render)
 const elementMap = {}
+const imageUrlMap = {}
 for (const name of allCharacters) {
   const char = genshindb.characters(name)
   if (char) elementMap[name] = char.elementType ?? null
+  imageUrlMap[name] = getCharacterIconUrl(name)
 }
+
+// Search query for filtering characters in ownership mode
+const searchQuery = ref('')
+
+// Clear search when exiting ownership mode
+watch(() => state.ownershipMode, (isOn) => {
+  if (!isOn) searchQuery.value = ''
+})
 
 // If no characters are owned yet (first launch), auto-enter ownership mode
 watch(() => state.ownedCharacters.length, (len) => {
@@ -46,11 +55,19 @@ watch(() => state.ownedCharacters.length, (len) => {
  * - Ownership mode ON  → all characters
  * - Ownership mode OFF → only owned characters
  */
-const displayedCharacters = computed(() =>
-  state.ownershipMode
+const displayedCharacters = computed(() => {
+  let chars = state.ownershipMode
     ? allCharacters
     : allCharacters.filter(name => state.ownedCharacters.includes(name))
-)
+
+  // Apply search filter in ownership mode
+  if (state.ownershipMode && searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    chars = chars.filter(name => name.toLowerCase().includes(query))
+  }
+
+  return chars
+})
 
 function handleCardClick(name) {
   if (state.ownershipMode) {
@@ -77,6 +94,17 @@ function getLevel(name) {
       </p>
     </div>
 
+    <!-- Search bar — visible only in ownership mode -->
+    <div v-if="state.ownershipMode" class="px-2 pt-2 shrink-0">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search characters..."
+        class="w-full bg-genshin-panel2 border border-genshin-border rounded px-2 py-1.5 text-genshin-text text-xs
+               placeholder-genshin-muted focus:outline-none focus:border-genshin-gold"
+      />
+    </div>
+
     <!-- Character grid — scrollable -->
     <div class="flex-1 overflow-y-auto p-2">
       <p
@@ -95,6 +123,7 @@ function getLevel(name) {
           :is-selected="state.selectedCharacter === name"
           :level="getLevel(name)"
           :element="elementMap[name]"
+          :image-url="imageUrlMap[name]"
           @click="handleCardClick(name)"
         />
       </div>

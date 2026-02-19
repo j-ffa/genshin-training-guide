@@ -189,6 +189,42 @@ export function getTalentCosts(charName, currentLevel, targetLevel) {
 }
 
 /**
+ * Returns the MiHoYo CDN icon URL for a character, or null if unavailable.
+ */
+export function getCharacterIconUrl(charName) {
+  return getCharacter(charName)?.images?.mihoyo_icon ?? null
+}
+
+/**
+ * Returns the MiHoYo CDN icon URL for a weapon, or null if unavailable.
+ */
+export function getWeaponIconUrl(weaponName) {
+  return getWeapon(weaponName)?.images?.mihoyo_icon ?? null
+}
+
+// ──────────────────────────────────────────────────────────
+// Material queries
+// ──────────────────────────────────────────────────────────
+
+const _materialCache = {}
+
+/**
+ * Returns an icon URL for a material.
+ * genshin-db materials only provide `filename_icon` (no full URL),
+ * so we construct a URL using the Enka.Network CDN which hosts game assets.
+ */
+export function getMaterialIconUrl(materialName) {
+  if (_materialCache[materialName] === undefined) {
+    const mat = genshindb.materials(materialName)
+    const filename = mat?.images?.filename_icon
+    _materialCache[materialName] = filename
+      ? `https://enka.network/ui/${filename}.png`
+      : null
+  }
+  return _materialCache[materialName]
+}
+
+/**
  * Returns the display names for a character's three combat talents.
  * Falls back to generic labels if data is unavailable.
  */

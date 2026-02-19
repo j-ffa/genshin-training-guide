@@ -13,13 +13,19 @@
  * - Selected                        → gold border highlight
  */
 
+import { ref } from 'vue'
+
 const props = defineProps({
   name:       { type: String,  required: true },
   isOwned:    { type: Boolean, default: false },
   isSelected: { type: Boolean, default: false },
   level:      { type: Number,  default: null  },  // current goal level, or null
   element:    { type: String,  default: null  },  // e.g. "ELEMENT_PYRO"
+  imageUrl:   { type: String,  default: null  },  // CDN icon URL
 })
+
+// Falls back to letter placeholder if image fails to load
+const imgFailed = ref(false)
 
 // Map genshin-db's internal element codes to Tailwind bg colours.
 // Using inline style for the exact game colours rather than theme tokens,
@@ -46,12 +52,20 @@ const elementColour = props.element ? (ELEMENT_COLOURS[props.element] ?? '#5a647
       'hover:brightness-110': isOwned,
     }"
   >
-    <!-- Portrait placeholder: coloured square with character initial -->
+    <!-- Portrait: CDN image with fallback to coloured letter placeholder -->
     <div
-      class="w-14 h-14 rounded flex items-center justify-center text-white text-xl font-bold shrink-0"
+      class="w-14 h-14 rounded overflow-hidden flex items-center justify-center text-white text-xl font-bold shrink-0"
       :style="{ backgroundColor: elementColour }"
     >
-      {{ name[0] }}
+      <img
+        v-if="imageUrl && !imgFailed"
+        :src="imageUrl"
+        :alt="name"
+        class="w-full h-full object-cover"
+        loading="lazy"
+        @error="imgFailed = true"
+      />
+      <span v-else>{{ name[0] }}</span>
     </div>
 
     <!-- Character name (truncated) -->

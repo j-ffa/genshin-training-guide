@@ -16,7 +16,7 @@
 
 import { computed } from 'vue'
 import { useTrainingGuide } from '../../composables/useTrainingGuide.js'
-import { getArtifactLevelCost } from '../../data/levelTables.js'
+import { getArtifactLevelCost, getArtifactXpCost } from '../../data/levelTables.js'
 
 const { state, currentGoal, updateGoal } = useTrainingGuide()
 
@@ -40,6 +40,14 @@ function slotMora(artifact) {
   return getArtifactLevelCost(current, target)
 }
 
+/** Artifact XP (fodder) cost for a single slot. */
+function slotXp(artifact) {
+  const current = snapToMilestone(artifact.currentLevel)
+  const target  = artifact.targetLevel
+  if (current >= target) return 0
+  return getArtifactXpCost(current, target)
+}
+
 /** Snaps a level to the nearest lower artifact milestone */
 function snapToMilestone(lvl) {
   const milestones = ARTIFACT_LEVEL_OPTIONS
@@ -54,6 +62,11 @@ const totalMora = computed(() => {
   return currentGoal.value.artifacts.reduce((sum, a) => sum + slotMora(a), 0)
 })
 
+const totalXp = computed(() => {
+  if (!currentGoal.value) return 0
+  return currentGoal.value.artifacts.reduce((sum, a) => sum + slotXp(a), 0)
+})
+
 // Emoji icons for each artifact slot type
 const SLOT_ICONS = {
   Flower:  '🌸',
@@ -66,12 +79,13 @@ const SLOT_ICONS = {
 
 <template>
   <div v-if="currentGoal">
-    <!-- Total Mora banner -->
+    <!-- Total Mora + XP banner -->
     <div class="flex items-center justify-between px-5 py-3 border-b border-genshin-border bg-genshin-panel2/50">
-      <span class="text-[11px] text-genshin-muted uppercase tracking-wide">Total Mora (artifacts)</span>
-      <span class="text-genshin-gold font-semibold text-sm">
-        {{ totalMora.toLocaleString() }}
-      </span>
+      <span class="text-[11px] text-genshin-muted uppercase tracking-wide">Total (artifacts)</span>
+      <div class="text-right">
+        <span class="text-genshin-gold font-semibold text-sm">{{ totalMora.toLocaleString() }} Mora</span>
+        <span class="block text-genshin-muted text-[11px]">{{ totalXp.toLocaleString() }} EXP</span>
+      </div>
     </div>
 
     <!-- One row per artifact slot -->
@@ -93,7 +107,7 @@ const SLOT_ICONS = {
           :value="artifact.currentLevel"
           @change="setArtifactLevel(idx, 'currentLevel', parseInt($event.target.value, 10))"
           class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1 text-genshin-text text-xs
-                 focus:outline-none focus:border-genshin-gold cursor-pointer w-14 text-center"
+                 focus:outline-none focus:border-genshin-gold cursor-pointer w-16 text-center"
         >
           <option v-for="lvl in ARTIFACT_LEVEL_OPTIONS" :key="lvl" :value="lvl">+{{ lvl }}</option>
         </select>
@@ -108,7 +122,7 @@ const SLOT_ICONS = {
           :value="artifact.targetLevel"
           @change="setArtifactLevel(idx, 'targetLevel', parseInt($event.target.value, 10))"
           class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1 text-genshin-text text-xs
-                 focus:outline-none focus:border-genshin-gold cursor-pointer w-14 text-center"
+                 focus:outline-none focus:border-genshin-gold cursor-pointer w-16 text-center"
         >
           <option
             v-for="lvl in ARTIFACT_LEVEL_OPTIONS.filter(l => l > artifact.currentLevel)"
@@ -118,11 +132,16 @@ const SLOT_ICONS = {
         </select>
       </div>
 
-      <!-- Mora cost for this slot -->
+      <!-- Mora + XP cost for this slot -->
       <div class="flex-1 text-right">
-        <span v-if="slotMora(artifact) > 0" class="text-genshin-gold text-sm font-medium">
-          {{ slotMora(artifact).toLocaleString() }} Mora
-        </span>
+        <template v-if="slotMora(artifact) > 0">
+          <span class="text-genshin-gold text-sm font-medium">
+            {{ slotMora(artifact).toLocaleString() }} Mora
+          </span>
+          <span class="block text-genshin-muted text-[11px]">
+            {{ slotXp(artifact).toLocaleString() }} EXP
+          </span>
+        </template>
         <span v-else class="text-genshin-muted text-xs">Done</span>
       </div>
     </div>

@@ -5,10 +5,10 @@
  * A reusable "Current → Target" level selector used in all four tabs.
  *
  * Shows:
- *   Current level: [number input]   →   Level up to: [dropdown of valid targets]
+ *   Current level: [dropdown]   →   Level up to: [dropdown of valid targets]
  *
- * The parent passes the valid target options (e.g. [20, 40, 50, 60, 70, 80, 90]
- * for characters, or 1-10 for talents).
+ * The parent passes both current and target options arrays.
+ * Optional currentLabels maps level numbers to display suffixes (e.g. ascension phases).
  *
  * v-model:currentLevel and v-model:targetLevel are used for two-way binding.
  */
@@ -17,33 +17,37 @@ import { computed } from 'vue'
 const props = defineProps({
   currentLevel: { type: Number,  required: true },
   targetLevel:  { type: Number,  required: true },
+  /** All valid level options for the current dropdown */
+  currentOptions: { type: Array, required: true },
   /** All valid level options for the target dropdown */
   targetOptions: { type: Array, required: true },
+  /** Optional display labels for current options, e.g. { 20: 'A1', 40: 'A2' } */
+  currentLabels: { type: Object, default: () => ({}) },
   /** Label shown above the current level input */
   currentLabel: { type: String, default: 'Current level' },
   /** Label shown above the target level input */
   targetLabel:  { type: String, default: 'Level up to' },
-  /** Min value for the current level input */
-  currentMin:   { type: Number, default: 1 },
-  /** Max value for the current level input (usually targetLevel - 1) */
-  currentMax:   { type: Number, default: 89 },
+  /** When true, target options include levels >= current (instead of strictly >) */
+  allowEqual: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:currentLevel', 'update:targetLevel'])
 
-// Only show target options that are greater than the current level
+// Only show target options that are greater than (or >= if allowEqual) the current level
 const validTargetOptions = computed(() =>
-  props.targetOptions.filter(lvl => lvl > props.currentLevel)
+  props.allowEqual
+    ? props.targetOptions.filter(lvl => lvl >= props.currentLevel)
+    : props.targetOptions.filter(lvl => lvl > props.currentLevel)
 )
 
-function onCurrentInput(e) {
+function onCurrentChange(e) {
   const val = parseInt(e.target.value, 10)
   if (!isNaN(val)) {
-    const clamped = Math.max(props.currentMin, Math.min(val, props.currentMax))
-    emit('update:currentLevel', clamped)
+    emit('update:currentLevel', val)
     // If target is now <= current, bump it to the next valid option
-    if (props.targetLevel <= clamped) {
-      const next = props.targetOptions.find(o => o > clamped)
+    const minTarget = props.allowEqual ? val : val + 1
+    if (props.targetLevel < minTarget) {
+      const next = props.targetOptions.find(o => o >= minTarget)
       if (next) emit('update:targetLevel', next)
     }
   }
@@ -59,15 +63,16 @@ function onTargetChange(e) {
     <!-- Current level -->
     <div class="flex flex-col gap-1">
       <label class="text-[11px] text-genshin-muted uppercase tracking-wide">{{ currentLabel }}</label>
-      <input
-        type="number"
+      <select
         :value="currentLevel"
-        :min="currentMin"
-        :max="currentMax"
-        @change="onCurrentInput"
-        class="w-16 bg-genshin-panel2 border border-genshin-border rounded px-2 py-1.5 text-genshin-text text-sm text-center
-               focus:outline-none focus:border-genshin-gold appearance-none"
-      />
+        @change="onCurrentChange"
+        class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1.5 text-genshin-text text-sm
+               focus:outline-none focus:border-genshin-gold cursor-pointer"
+      >
+        <option v-for="lvl in currentOptions" :key="lvl" :value="lvl">
+          {{ lvl }}{{ currentLabels[lvl] ? ` (${currentLabels[lvl]})` : '' }}
+        </option>
+      </select>
     </div>
 
     <!-- Arrow -->

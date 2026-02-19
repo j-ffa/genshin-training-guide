@@ -14,17 +14,19 @@
 
 import { computed } from 'vue'
 import { useTrainingGuide } from '../../composables/useTrainingGuide.js'
-import { getCharacterAscensionCosts } from '../../data/genshinData.js'
+import { getCharacterAscensionCosts, getMaterialIconUrl } from '../../data/genshinData.js'
 import { getCharacterLevelUpCosts, CHARACTER_CUMULATIVE_EXP } from '../../data/levelTables.js'
 import LevelRangeInput from '../shared/LevelRangeInput.vue'
 import MaterialRow from '../shared/MaterialRow.vue'
 
 const { state, currentGoal, updateGoal } = useTrainingGuide()
 
-// Valid target level options for the dropdown
-const TARGET_LEVEL_OPTIONS = Object.keys(CHARACTER_CUMULATIVE_EXP)
-  .map(Number)
-  .filter(n => n > 1)  // exclude level 1
+// Valid level options for current/target dropdowns
+const LEVEL_OPTIONS = Object.keys(CHARACTER_CUMULATIVE_EXP).map(Number)
+const TARGET_LEVEL_OPTIONS = LEVEL_OPTIONS.filter(n => n > 1)
+
+// Ascension phase labels for the current level dropdown
+const CURRENT_LABELS = { 20: 'A1', 40: 'A2', 50: 'A3', 60: 'A4', 70: 'A5', 80: 'A6' }
 
 // ─── Level range input bindings ─────────────────────────────
 
@@ -98,11 +100,11 @@ const hasNoChange = computed(() =>
     <LevelRangeInput
       :current-level="currentGoal.currentLevel"
       :target-level="currentGoal.targetLevel"
+      :current-options="LEVEL_OPTIONS"
       :target-options="TARGET_LEVEL_OPTIONS"
+      :current-labels="CURRENT_LABELS"
       current-label="Current level"
       target-label="Level up to"
-      :current-min="1"
-      :current-max="89"
       @update:current-level="setCurrentLevel"
       @update:target-level="setTargetLevel"
     />
@@ -125,6 +127,7 @@ const hasNoChange = computed(() =>
         :name="mat.name"
         :count="mat.count"
         :is-mora="mat.isMora ?? false"
+        :icon-url="getMaterialIconUrl(mat.name)"
       />
     </div>
   </div>

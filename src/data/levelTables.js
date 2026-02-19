@@ -170,3 +170,25 @@ export function getArtifactLevelCost(currentLevel, targetLevel) {
   const toMora   = ARTIFACT_5STAR_CUMULATIVE_MORA[targetLevel]  ?? 0
   return Math.max(0, toMora - fromMora)
 }
+
+/**
+ * Cumulative Artifact EXP (fodder XP) needed to level a 5★ artifact from +0.
+ * Source: Genshin Impact community wiki.
+ */
+export const ARTIFACT_5STAR_CUMULATIVE_XP = {
+  0:  0,
+  4:  16_300,
+  8:  66_650,
+  12: 189_325,
+  16: 436_675,
+  20: 871_500,
+}
+
+/**
+ * Returns the artifact fodder XP needed to level a 5★ artifact from currentLevel to targetLevel.
+ */
+export function getArtifactXpCost(currentLevel, targetLevel) {
+  const fromXp = ARTIFACT_5STAR_CUMULATIVE_XP[currentLevel] ?? 0
+  const toXp   = ARTIFACT_5STAR_CUMULATIVE_XP[targetLevel]  ?? 0
+  return Math.max(0, toXp - fromXp)
+}

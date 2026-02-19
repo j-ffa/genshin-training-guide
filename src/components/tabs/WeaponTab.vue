@@ -8,19 +8,18 @@
  *  3. See the ascension materials + Mystic Enhancement Ores + Mora required
  */
 
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import genshindb from 'genshin-db'
 import { useTrainingGuide } from '../../composables/useTrainingGuide.js'
-import { getCharacterWeaponType, getAllWeaponNames, getWeaponAscensionCosts } from '../../data/genshinData.js'
+import { getCharacterWeaponType, getAllWeaponNames, getWeaponAscensionCosts, getWeaponIconUrl, getMaterialIconUrl } from '../../data/genshinData.js'
 import { getWeaponLevelUpCosts, WEAPON_5STAR_CUMULATIVE_EXP } from '../../data/levelTables.js'
 import LevelRangeInput from '../shared/LevelRangeInput.vue'
 import MaterialRow from '../shared/MaterialRow.vue'
 
 const { state, currentGoal, updateGoal } = useTrainingGuide()
 
-const TARGET_LEVEL_OPTIONS = Object.keys(WEAPON_5STAR_CUMULATIVE_EXP)
-  .map(Number)
-  .filter(n => n > 1)
+const LEVEL_OPTIONS = Object.keys(WEAPON_5STAR_CUMULATIVE_EXP).map(Number)
+const TARGET_LEVEL_OPTIONS = LEVEL_OPTIONS.filter(n => n > 1)
 
 // ─── Weapon selector ────────────────────────────────────────
 
@@ -37,7 +36,16 @@ const compatibleWeapons = computed(() => {
     .sort()
 })
 
+const weaponImgFailed = ref(false)
+
+const selectedWeaponIcon = computed(() => {
+  const name = currentGoal.value?.weapon
+  if (!name) return null
+  return getWeaponIconUrl(name)
+})
+
 function setWeapon(e) {
+  weaponImgFailed.value = false
   updateGoal(state.selectedCharacter, goal => {
     goal.weapon = e.target.value || null
   })
@@ -109,15 +117,24 @@ const atTarget = computed(() =>
       <label class="block text-[11px] text-genshin-muted uppercase tracking-wide mb-1.5">
         Weapon
       </label>
-      <select
-        :value="currentGoal.weapon ?? ''"
-        @change="setWeapon"
-        class="w-full bg-genshin-panel2 border border-genshin-border rounded px-3 py-2 text-genshin-text text-sm
-               focus:outline-none focus:border-genshin-gold cursor-pointer"
-      >
-        <option value="">— Select a weapon —</option>
-        <option v-for="name in compatibleWeapons" :key="name" :value="name">{{ name }}</option>
-      </select>
+      <div class="flex items-center gap-3">
+        <select
+          :value="currentGoal.weapon ?? ''"
+          @change="setWeapon"
+          class="flex-1 bg-genshin-panel2 border border-genshin-border rounded px-3 py-2 text-genshin-text text-sm
+                 focus:outline-none focus:border-genshin-gold cursor-pointer"
+        >
+          <option value="">— Select a weapon —</option>
+          <option v-for="name in compatibleWeapons" :key="name" :value="name">{{ name }}</option>
+        </select>
+        <img
+          v-if="selectedWeaponIcon && !weaponImgFailed"
+          :src="selectedWeaponIcon"
+          :alt="currentGoal.weapon"
+          class="w-12 h-12 rounded object-cover shrink-0"
+          @error="weaponImgFailed = true"
+        />
+      </div>
     </div>
 
     <!-- Level range (only visible once a weapon is selected) -->
@@ -125,11 +142,10 @@ const atTarget = computed(() =>
       <LevelRangeInput
         :current-level="currentGoal.weaponCurrentLevel"
         :target-level="currentGoal.weaponTargetLevel"
+        :current-options="LEVEL_OPTIONS"
         :target-options="TARGET_LEVEL_OPTIONS"
         current-label="Current level"
         target-label="Level up to"
-        :current-min="1"
-        :current-max="89"
         @update:current-level="setWeaponCurrentLevel"
         @update:target-level="setWeaponTargetLevel"
       />
@@ -150,6 +166,7 @@ const atTarget = computed(() =>
           :name="mat.name"
           :count="mat.count"
           :is-mora="mat.isMora ?? false"
+          :icon-url="getMaterialIconUrl(mat.name)"
         />
       </div>
     </template>
