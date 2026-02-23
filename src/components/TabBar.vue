@@ -8,6 +8,8 @@
 
 const props = defineProps({
   modelValue: { type: String, required: true },
+  /** Object keyed by tab id → boolean, true if that tab's goals are fully complete */
+  completionStatus: { type: Object, default: () => ({}) },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -33,6 +35,7 @@ const TABS = [
     >
       <span>{{ tab.icon }}</span>
       <span>{{ tab.label }}</span>
+      <span v-if="completionStatus[tab.id]" class="w-1.5 h-1.5 rounded-full bg-genshin-green shrink-0" title="Complete"></span>
     </button>
   </div>
 </template>

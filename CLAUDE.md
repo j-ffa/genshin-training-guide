@@ -18,9 +18,9 @@ Allow players to track levelling progress for any number of characters simultane
 - **genshin-db** v5.2.8 (npm package by theBowja — provides character/weapon/talent game data)
 - No backend — persistence via browser `localStorage`
 
-## Current State (as of 2026-02-19)
+## Current State (as of 2026-02-23)
 
-The core app is fully built and working. All five build phases plus a quick-wins sprint are complete.
+The core app is fully built and working. All five build phases plus a quick-wins sprint are complete, plus artifact substats, completion indicators, and export/import.
 
 ### What's done
 - Dark Genshin-themed two-column layout (left: character grid, right: detail panel)
@@ -29,18 +29,18 @@ The core app is fully built and working. All five build phases plus a quick-wins
 - Per-character goal settings persisted to `localStorage`, lazily created on first selection
 - **Character Level tab** — preset dropdown selectors with ascension phase labels (A1–A6), shows combined Mora + Hero's Wits + all ascension materials
 - **Weapon tab** — weapon selector filtered to character's weapon type, weapon icon displayed when selected, ascension costs + Mystic Enhancement Ores
-- **Artifacts tab** — 5 slots with milestone level dropdowns (+0/+4/+8/+12/+16/+20), Mora + EXP cost per slot + totals
+- **Artifacts tab** — 5 collapsible slots with milestone level dropdowns (+0/+4/+8/+12/+16/+20), Mora + EXP cost per slot + totals. Each slot has **main stat selector** (locked for Flower=HP, Plume=ATK) and **desired substats** with configurable farming strictness (how many of the selected substats the user wants)
 - **Talents tab** — 3 collapsible talent sections with real in-game talent names, independent level ranges 1–10, materials per talent, allows current=target
+- **Green completion indicators** — green dots on tab bar when all goals in a tab are at target, plus individual green dots on talent section headers
+- **JSON export/import buttons** in the character grid footer — export downloads a JSON backup, import opens a file picker
 - **Character portrait images** from Enka.Network CDN with element-coloured letter fallback
 - **Material icons** from Enka.Network CDN with letter fallback
 - All state auto-saved to `localStorage` on every change (loaded at module init to avoid race conditions)
 
 ### What's NOT done yet
-- Green "complete" indicator for talents/sections that have reached their target
-- Artifact substats — target main stat and substat tracking (GitHub issue #6)
-- JSON export/import button in the UI (the functions `exportData()` / `importData()` are already written in `useTrainingGuide.js`, just need a UI trigger)
 - Cross-character total material summary (aggregate Mora + shared materials across all tracked characters)
 - Material inventory tracking (what the user currently owns) — intentionally deferred
+- Full UI refresh to more closely match in-game Training Guide proportions and colour scheme
 
 ## Project Structure
 

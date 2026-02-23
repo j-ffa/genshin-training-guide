@@ -11,7 +11,7 @@
  * across sessions, and resets to Character Level on each new selection.
  */
 
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useTrainingGuide } from '../composables/useTrainingGuide.js'
 import DetailHeader from './DetailHeader.vue'
 import TabBar from './TabBar.vue'
@@ -20,13 +20,37 @@ import WeaponTab from './tabs/WeaponTab.vue'
 import ArtifactsTab from './tabs/ArtifactsTab.vue'
 import TalentsTab from './tabs/TalentsTab.vue'
 
-const { state } = useTrainingGuide()
+const { state, currentGoal } = useTrainingGuide()
 
 const activeTab = ref('characterLevel')
 
 // Reset to first tab whenever a different character is selected
 watch(() => state.selectedCharacter, () => {
   activeTab.value = 'characterLevel'
+})
+
+/**
+ * Completion status for each tab — true when current >= target for all goals in that tab.
+ * Used to show green dots on the tab bar.
+ */
+const tabCompletion = computed(() => {
+  const goal = currentGoal.value
+  if (!goal) return {}
+
+  const charDone = goal.currentLevel >= goal.targetLevel
+
+  const weaponDone = !goal.weapon || goal.weaponCurrentLevel >= goal.weaponTargetLevel
+
+  const artifactsDone = goal.artifacts.every(a => a.currentLevel >= a.targetLevel)
+
+  const talentsDone = Object.values(goal.talents).every(t => t.currentLevel >= t.targetLevel)
+
+  return {
+    characterLevel: charDone,
+    weapon: weaponDone,
+    artifacts: artifactsDone,
+    talents: talentsDone,
+  }
 })
 </script>
 
@@ -48,7 +72,7 @@ watch(() => state.selectedCharacter, () => {
   <div v-else class="flex flex-col h-full">
     <DetailHeader />
 
-    <TabBar v-model="activeTab" />
+    <TabBar v-model="activeTab" :completion-status="tabCompletion" />
 
     <!-- Tab content — scrollable -->
     <div class="flex-1 overflow-y-auto">

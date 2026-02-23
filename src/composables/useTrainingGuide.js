@@ -64,11 +64,11 @@ function createDefaultGoal() {
     weaponTargetLevel:  90,
 
     artifacts: [
-      { slot: 'Flower',  currentLevel: 0, targetLevel: 20 },
-      { slot: 'Plume',   currentLevel: 0, targetLevel: 20 },
-      { slot: 'Sands',   currentLevel: 0, targetLevel: 20 },
-      { slot: 'Goblet',  currentLevel: 0, targetLevel: 20 },
-      { slot: 'Circlet', currentLevel: 0, targetLevel: 20 },
+      { slot: 'Flower',  currentLevel: 0, targetLevel: 20, mainStat: 'HP',  desiredSubstats: [], targetSubstatCount: 0 },
+      { slot: 'Plume',   currentLevel: 0, targetLevel: 20, mainStat: 'ATK', desiredSubstats: [], targetSubstatCount: 0 },
+      { slot: 'Sands',   currentLevel: 0, targetLevel: 20, mainStat: null,  desiredSubstats: [], targetSubstatCount: 0 },
+      { slot: 'Goblet',  currentLevel: 0, targetLevel: 20, mainStat: null,  desiredSubstats: [], targetSubstatCount: 0 },
+      { slot: 'Circlet', currentLevel: 0, targetLevel: 20, mainStat: null,  desiredSubstats: [], targetSubstatCount: 0 },
     ],
 
     talents: {

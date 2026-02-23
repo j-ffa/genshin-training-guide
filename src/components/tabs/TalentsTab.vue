@@ -96,9 +96,16 @@ const TALENT_SECTIONS = [
         <span class="text-genshin-muted text-xs w-3 shrink-0">{{ expanded[section.key] ? '▾' : '▸' }}</span>
 
         <div class="flex-1 min-w-0">
-          <h3 class="text-genshin-text text-sm font-medium">
-            {{ talentNames[section.key] ?? section.fallback }}
-          </h3>
+          <div class="flex items-center gap-1.5">
+            <h3 class="text-genshin-text text-sm font-medium">
+              {{ talentNames[section.key] ?? section.fallback }}
+            </h3>
+            <span
+              v-if="currentGoal.talents[section.key].currentLevel >= currentGoal.talents[section.key].targetLevel"
+              class="w-1.5 h-1.5 rounded-full bg-genshin-green shrink-0"
+              title="Complete"
+            ></span>
+          </div>
           <p class="text-genshin-muted text-[11px] capitalize">{{ section.key.replace('normalAttack', 'Normal Attack') }}</p>
         </div>
 

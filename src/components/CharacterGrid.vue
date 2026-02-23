@@ -23,7 +23,7 @@ import genshindb from 'genshin-db'
 import CharacterCard from './CharacterCard.vue'
 import OwnershipToggle from './shared/OwnershipToggle.vue'
 
-const { state, selectCharacter, toggleOwnership } = useTrainingGuide()
+const { state, selectCharacter, toggleOwnership, exportData, importData } = useTrainingGuide()
 
 // All characters from genshin-db (Traveler excluded)
 const allCharacters = getAllCharacterNames()
@@ -81,6 +81,21 @@ function handleCardClick(name) {
 function getLevel(name) {
   return state.characterGoals[name]?.currentLevel ?? null
 }
+
+/** Trigger a file picker and import the selected JSON file */
+function handleImport() {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.json,application/json'
+  input.onchange = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => importData(reader.result)
+    reader.readAsText(file)
+  }
+  input.click()
+}
 </script>
 
 <template>
@@ -129,9 +144,27 @@ function getLevel(name) {
       </div>
     </div>
 
-    <!-- Ownership toggle button — pinned to bottom -->
-    <div class="p-2 shrink-0 border-t border-genshin-border">
+    <!-- Footer: ownership toggle + export/import — pinned to bottom -->
+    <div class="p-2 shrink-0 border-t border-genshin-border space-y-1.5">
       <OwnershipToggle />
+      <div class="flex gap-1.5">
+        <button
+          @click="exportData"
+          class="flex-1 px-2 py-1 text-[10px] text-genshin-muted border border-genshin-border rounded
+                 hover:text-genshin-text hover:border-genshin-gold/50 transition-colors cursor-pointer"
+          title="Download all data as JSON"
+        >
+          Export
+        </button>
+        <button
+          @click="handleImport"
+          class="flex-1 px-2 py-1 text-[10px] text-genshin-muted border border-genshin-border rounded
+                 hover:text-genshin-text hover:border-genshin-gold/50 transition-colors cursor-pointer"
+          title="Import data from a JSON file"
+        >
+          Import
+        </button>
+      </div>
     </div>
   </div>
 </template>
