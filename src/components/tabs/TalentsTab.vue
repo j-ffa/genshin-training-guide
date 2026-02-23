@@ -85,19 +85,19 @@ const TALENT_SECTIONS = [
     <div
       v-for="section in TALENT_SECTIONS"
       :key="section.key"
-      class="border-b border-genshin-border last:border-0"
+      class="border-b border-genshin-detail-border last:border-0"
     >
       <!-- Talent section header (clickable to toggle) -->
       <div
-        class="flex items-center gap-2 px-5 pt-4 pb-2 cursor-pointer select-none hover:bg-genshin-panel2/30 transition-colors"
+        class="flex items-center gap-2 px-5 pt-4 pb-2 cursor-pointer select-none hover:bg-genshin-detail-card/40 transition-colors"
         @click="expanded[section.key] = !expanded[section.key]"
       >
         <!-- Chevron indicator -->
-        <span class="text-genshin-muted text-xs w-3 shrink-0">{{ expanded[section.key] ? '▾' : '▸' }}</span>
+        <span class="text-genshin-detail-muted text-xs w-3 shrink-0">{{ expanded[section.key] ? '▾' : '▸' }}</span>
 
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-1.5">
-            <h3 class="text-genshin-text text-sm font-medium">
+            <h3 class="text-genshin-detail-text text-sm font-medium">
               {{ talentNames[section.key] ?? section.fallback }}
             </h3>
             <span
@@ -106,11 +106,11 @@ const TALENT_SECTIONS = [
               title="Complete"
             ></span>
           </div>
-          <p class="text-genshin-muted text-[11px] capitalize">{{ section.key.replace('normalAttack', 'Normal Attack') }}</p>
+          <p class="text-genshin-detail-muted text-[11px] capitalize">{{ section.key.replace('normalAttack', 'Normal Attack') }}</p>
         </div>
 
         <!-- Compact summary when collapsed -->
-        <span v-if="!expanded[section.key]" class="text-genshin-muted text-xs shrink-0">
+        <span v-if="!expanded[section.key]" class="text-genshin-detail-muted text-xs shrink-0">
           Lv.{{ currentGoal.talents[section.key].currentLevel }} → Lv.{{ currentGoal.talents[section.key].targetLevel }}
         </span>
       </div>
@@ -133,7 +133,7 @@ const TALENT_SECTIONS = [
         <!-- Materials for this talent -->
         <div
           v-if="currentGoal.talents[section.key].currentLevel >= currentGoal.talents[section.key].targetLevel"
-          class="px-5 pb-4 text-genshin-muted text-xs"
+          class="px-5 pb-4 text-genshin-detail-muted text-xs"
         >
           Already at target level.
         </div>

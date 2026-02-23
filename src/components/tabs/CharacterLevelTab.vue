@@ -110,13 +110,13 @@ const hasNoChange = computed(() =>
     />
 
     <!-- Material list -->
-    <div v-if="hasNoChange" class="p-5 text-genshin-muted text-sm">
+    <div v-if="hasNoChange" class="p-5 text-genshin-detail-muted text-sm">
       Already at target level.
     </div>
 
     <div v-else>
       <div class="px-4 pt-3 pb-1">
-        <p class="text-[11px] text-genshin-muted uppercase tracking-wide">
+        <p class="text-[11px] text-genshin-detail-muted uppercase tracking-wide">
           Materials needed (Lv. {{ currentGoal.currentLevel }} → {{ currentGoal.targetLevel }})
         </p>
       </div>

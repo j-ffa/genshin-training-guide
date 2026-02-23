@@ -58,9 +58,9 @@ const tabCompletion = computed(() => {
   <!-- No character selected -->
   <div
     v-if="!state.selectedCharacter"
-    class="flex items-center justify-center h-full"
+    class="flex items-center justify-center h-full bg-genshin-detail-bg"
   >
-    <p class="text-genshin-muted text-sm text-center leading-relaxed">
+    <p class="text-genshin-detail-muted text-sm text-center leading-relaxed">
       Select a character<br>
       <span class="text-xs opacity-70">
         {{ state.ownershipMode ? 'Exit roster edit mode first' : 'from the list on the left' }}
@@ -69,7 +69,7 @@ const tabCompletion = computed(() => {
   </div>
 
   <!-- Character selected -->
-  <div v-else class="flex flex-col h-full">
+  <div v-else class="flex flex-col h-full bg-genshin-detail-bg text-genshin-detail-text">
     <DetailHeader />
 
     <TabBar v-model="activeTab" :completion-status="tabCompletion" />

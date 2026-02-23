@@ -54,7 +54,7 @@ const elementColour = props.element ? (ELEMENT_COLOURS[props.element] ?? '#5a647
   >
     <!-- Portrait: CDN image with fallback to coloured letter placeholder -->
     <div
-      class="w-14 h-14 rounded overflow-hidden flex items-center justify-center text-white text-xl font-bold shrink-0"
+      class="w-20 h-20 rounded-lg overflow-hidden flex items-center justify-center text-white text-xl font-bold shrink-0 relative"
       :style="{ backgroundColor: elementColour }"
     >
       <img
@@ -66,19 +66,19 @@ const elementColour = props.element ? (ELEMENT_COLOURS[props.element] ?? '#5a647
         @error="imgFailed = true"
       />
       <span v-else>{{ name[0] }}</span>
+
+      <!-- Level badge — shown only if a goal has been created for this character -->
+      <span
+        v-if="level !== null"
+        class="absolute bottom-0.5 left-0.5 text-[9px] bg-black/60 text-genshin-gold px-1 rounded leading-tight"
+      >
+        Lv. {{ level }}
+      </span>
     </div>
 
     <!-- Character name (truncated) -->
-    <span class="text-[10px] text-center leading-tight text-genshin-text w-full truncate px-0.5">
+    <span class="text-[11px] text-center leading-tight text-genshin-text w-full truncate px-0.5">
       {{ name }}
-    </span>
-
-    <!-- Level badge — shown only if a goal has been created for this character -->
-    <span
-      v-if="level !== null"
-      class="absolute top-0.5 right-0.5 text-[9px] bg-black/60 text-genshin-gold px-1 rounded leading-tight"
-    >
-      {{ level }}
     </span>
   </div>
 </template>

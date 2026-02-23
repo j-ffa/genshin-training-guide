@@ -33,7 +33,7 @@ const elementColour = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center gap-3 px-5 py-4 border-b border-genshin-border shrink-0">
+  <div class="flex items-center gap-3 px-6 py-5 border-b border-genshin-detail-border shrink-0">
     <!-- Element colour dot -->
     <div
       class="w-3 h-3 rounded-full shrink-0"
@@ -42,10 +42,10 @@ const elementColour = computed(() => {
 
     <!-- Character name -->
     <div class="flex-1 min-w-0">
-      <h2 class="text-genshin-gold text-lg font-semibold leading-tight truncate">
+      <h2 class="text-genshin-detail-text text-lg font-semibold leading-tight truncate">
         {{ state.selectedCharacter }}
       </h2>
-      <p v-if="currentGoal" class="text-genshin-muted text-xs mt-0.5">
+      <p v-if="currentGoal" class="text-genshin-detail-muted text-xs mt-0.5">
         Lv. {{ currentGoal.currentLevel }} → {{ currentGoal.targetLevel }}
       </p>
     </div>

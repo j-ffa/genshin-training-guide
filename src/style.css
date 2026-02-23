@@ -5,15 +5,22 @@
    Tailwind v4 uses @theme instead of config.js
    ============================================= */
 @theme {
-  --color-genshin-bg:     #1a1f2e;
-  --color-genshin-panel:  #252d3d;
-  --color-genshin-panel2: #1e2635;
-  --color-genshin-border: #3a4558;
-  --color-genshin-gold:   #c8a96e;
-  --color-genshin-text:   #e8dcc8;
-  --color-genshin-muted:  #7a8499;
+  --color-genshin-bg:     #1c1a17;
+  --color-genshin-panel:  #2a261f;
+  --color-genshin-panel2: #23201a;
+  --color-genshin-border: #4a4137;
+  --color-genshin-gold:   #d4b85c;
+  --color-genshin-text:   #ece5d8;
+  --color-genshin-muted:  #8b7f70;
   --color-genshin-red:    #e05555;
   --color-genshin-green:  #5cba6a;
+
+  /* Detail panel (parchment/light background) */
+  --color-genshin-detail-bg:     #ece5d8;
+  --color-genshin-detail-text:   #3b3127;
+  --color-genshin-detail-muted:  #8b7f70;
+  --color-genshin-detail-border: #d4c9b5;
+  --color-genshin-detail-card:   #e0d7c8;
 }
 
 /* Base resets */

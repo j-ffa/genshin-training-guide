@@ -160,11 +160,11 @@ function slotSummary(artifact) {
 <template>
   <div v-if="currentGoal">
     <!-- Total Mora + XP banner -->
-    <div class="flex items-center justify-between px-5 py-3 border-b border-genshin-border bg-genshin-panel2/50">
-      <span class="text-[11px] text-genshin-muted uppercase tracking-wide">Total (artifacts)</span>
+    <div class="flex items-center justify-between px-5 py-3 border-b border-genshin-detail-border bg-genshin-detail-card/50">
+      <span class="text-[11px] text-genshin-detail-muted uppercase tracking-wide">Total (artifacts)</span>
       <div class="text-right">
         <span class="text-genshin-gold font-semibold text-sm">{{ totalMora.toLocaleString() }} Mora</span>
-        <span class="block text-genshin-muted text-[11px]">{{ totalXp.toLocaleString() }} EXP</span>
+        <span class="block text-genshin-detail-muted text-[11px]">{{ totalXp.toLocaleString() }} EXP</span>
       </div>
     </div>
 
@@ -172,29 +172,29 @@ function slotSummary(artifact) {
     <div
       v-for="(artifact, idx) in currentGoal.artifacts"
       :key="artifact.slot"
-      class="border-b border-genshin-border/50 last:border-0"
+      class="border-b border-genshin-detail-border/50 last:border-0"
     >
       <!-- Slot header (clickable to toggle) -->
       <div
-        class="flex items-center gap-3 px-5 py-3 cursor-pointer select-none hover:bg-genshin-panel2/30 transition-colors"
+        class="flex items-center gap-3 px-5 py-3 cursor-pointer select-none hover:bg-genshin-detail-card/40 transition-colors"
         @click="expanded[idx] = !expanded[idx]"
       >
         <!-- Chevron -->
-        <span class="text-genshin-muted text-xs w-3 shrink-0">{{ expanded[idx] ? '▾' : '▸' }}</span>
+        <span class="text-genshin-detail-muted text-xs w-3 shrink-0">{{ expanded[idx] ? '▾' : '▸' }}</span>
 
         <!-- Slot icon + name -->
         <div class="flex items-center gap-2 w-24 shrink-0">
           <span class="text-lg">{{ SLOT_ICONS[artifact.slot] ?? '🔮' }}</span>
-          <span class="text-sm text-genshin-text">{{ artifact.slot }}</span>
+          <span class="text-sm text-genshin-detail-text">{{ artifact.slot }}</span>
         </div>
 
         <!-- Level display -->
-        <span class="text-genshin-muted text-xs">
+        <span class="text-genshin-detail-muted text-xs">
           +{{ artifact.currentLevel }} → +{{ artifact.targetLevel }}
         </span>
 
         <!-- Collapsed summary (main stat + substat count) -->
-        <span v-if="!expanded[idx] && slotSummary(artifact)" class="text-genshin-muted text-[11px] ml-auto truncate max-w-40">
+        <span v-if="!expanded[idx] && slotSummary(artifact)" class="text-genshin-detail-muted text-[11px] ml-auto truncate max-w-40">
           {{ slotSummary(artifact) }}
         </span>
 
@@ -205,35 +205,35 @@ function slotSummary(artifact) {
               {{ slotMora(artifact).toLocaleString() }} Mora
             </span>
           </template>
-          <span v-else class="text-genshin-muted text-xs">Done</span>
+          <span v-else class="text-genshin-detail-muted text-xs">Done</span>
         </div>
       </div>
 
       <!-- Expanded content -->
-      <div v-show="expanded[idx]" class="px-5 pb-4 pt-1 ml-5 border-l border-genshin-border/30">
+      <div v-show="expanded[idx]" class="px-5 pb-4 pt-1 ml-5 border-l border-genshin-detail-border/30">
 
         <!-- Level selectors -->
         <div class="flex items-center gap-3 mb-4">
           <div class="flex flex-col gap-0.5">
-            <label class="text-[10px] text-genshin-muted">From</label>
+            <label class="text-[10px] text-genshin-detail-muted">From</label>
             <select
               :value="artifact.currentLevel"
               @change="setArtifactLevel(idx, 'currentLevel', parseInt($event.target.value, 10))"
-              class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1 text-genshin-text text-xs
+              class="bg-white/60 border border-genshin-detail-border rounded px-2 py-1 text-genshin-detail-text text-xs
                      focus:outline-none focus:border-genshin-gold cursor-pointer w-16 text-center"
             >
               <option v-for="lvl in ARTIFACT_LEVEL_OPTIONS" :key="lvl" :value="lvl">+{{ lvl }}</option>
             </select>
           </div>
 
-          <span class="text-genshin-muted text-sm mt-3">→</span>
+          <span class="text-genshin-detail-muted text-sm mt-3">→</span>
 
           <div class="flex flex-col gap-0.5">
-            <label class="text-[10px] text-genshin-muted">To</label>
+            <label class="text-[10px] text-genshin-detail-muted">To</label>
             <select
               :value="artifact.targetLevel"
               @change="setArtifactLevel(idx, 'targetLevel', parseInt($event.target.value, 10))"
-              class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1 text-genshin-text text-xs
+              class="bg-white/60 border border-genshin-detail-border rounded px-2 py-1 text-genshin-detail-text text-xs
                      focus:outline-none focus:border-genshin-gold cursor-pointer w-16 text-center"
             >
               <option
@@ -246,15 +246,15 @@ function slotSummary(artifact) {
 
           <!-- XP display inline -->
           <div v-if="slotXp(artifact) > 0" class="ml-auto text-right">
-            <span class="text-genshin-muted text-[11px]">{{ slotXp(artifact).toLocaleString() }} EXP</span>
+            <span class="text-genshin-detail-muted text-[11px]">{{ slotXp(artifact).toLocaleString() }} EXP</span>
           </div>
         </div>
 
         <!-- Main stat selector -->
         <div class="mb-3">
-          <label class="text-[10px] text-genshin-muted uppercase tracking-wide block mb-1">Main Stat</label>
+          <label class="text-[10px] text-genshin-detail-muted uppercase tracking-wide block mb-1">Main Stat</label>
           <template v-if="isMainStatLocked(artifact.slot)">
-            <span class="text-genshin-text text-xs bg-genshin-panel2 border border-genshin-border rounded px-2 py-1 inline-block opacity-70">
+            <span class="text-genshin-detail-text text-xs bg-white/60 border border-genshin-detail-border rounded px-2 py-1 inline-block opacity-70">
               {{ artifact.mainStat }} (fixed)
             </span>
           </template>
@@ -262,7 +262,7 @@ function slotSummary(artifact) {
             v-else
             :value="artifact.mainStat ?? ''"
             @change="setMainStat(idx, $event.target.value)"
-            class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1 text-genshin-text text-xs
+            class="bg-white/60 border border-genshin-detail-border rounded px-2 py-1 text-genshin-detail-text text-xs
                    focus:outline-none focus:border-genshin-gold cursor-pointer"
           >
             <option value="">— Not set —</option>
@@ -273,19 +273,19 @@ function slotSummary(artifact) {
         <!-- Desired substats -->
         <div>
           <div class="flex items-center gap-2 mb-1.5">
-            <label class="text-[10px] text-genshin-muted uppercase tracking-wide">Desired Substats</label>
+            <label class="text-[10px] text-genshin-detail-muted uppercase tracking-wide">Desired Substats</label>
             <!-- How many of the desired substats the user is farming for -->
             <template v-if="(artifact.desiredSubstats?.length ?? 0) > 0">
-              <span class="text-[10px] text-genshin-muted">— farming for</span>
+              <span class="text-[10px] text-genshin-detail-muted">— farming for</span>
               <select
                 :value="artifact.targetSubstatCount ?? 0"
                 @change="setTargetSubstatCount(idx, parseInt($event.target.value, 10))"
-                class="bg-genshin-panel2 border border-genshin-border rounded px-1 py-0.5 text-genshin-text text-[11px]
+                class="bg-white/60 border border-genshin-detail-border rounded px-1 py-0.5 text-genshin-detail-text text-[11px]
                        focus:outline-none focus:border-genshin-gold cursor-pointer w-10 text-center"
               >
                 <option v-for="n in artifact.desiredSubstats.length" :key="n" :value="n">{{ n }}</option>
               </select>
-              <span class="text-[10px] text-genshin-muted">of {{ artifact.desiredSubstats.length }}</span>
+              <span class="text-[10px] text-genshin-detail-muted">of {{ artifact.desiredSubstats.length }}</span>
             </template>
           </div>
 
@@ -298,7 +298,7 @@ function slotSummary(artifact) {
               class="px-2 py-0.5 rounded text-[11px] border transition-colors cursor-pointer"
               :class="(artifact.desiredSubstats ?? []).includes(stat)
                 ? 'bg-genshin-gold/20 border-genshin-gold text-genshin-gold'
-                : 'bg-genshin-panel2 border-genshin-border text-genshin-muted hover:border-genshin-gold/50'"
+                : 'bg-white/60 border-genshin-detail-border text-genshin-detail-muted hover:border-genshin-gold/50'"
             >
               {{ stat }}
             </button>

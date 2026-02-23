@@ -29,3 +29,12 @@ HOSTING.txt
 # Terminal Paste Image folder
 # ClipboardPaste-Images, not the other one lol
 .cp-images/
+
+# Playwright MCP
+.playwright-mcp/
+
+# Screenshots
+current-state.png
+
+# VS Code workspace
+*.code-workspace

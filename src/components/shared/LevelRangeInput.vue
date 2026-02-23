@@ -59,14 +59,14 @@ function onTargetChange(e) {
 </script>
 
 <template>
-  <div class="flex items-end gap-4 px-5 py-4 border-b border-genshin-border">
+  <div class="flex items-end gap-4 px-5 py-4 border-b border-genshin-detail-border">
     <!-- Current level -->
     <div class="flex flex-col gap-1">
-      <label class="text-[11px] text-genshin-muted uppercase tracking-wide">{{ currentLabel }}</label>
+      <label class="text-[11px] text-genshin-detail-muted uppercase tracking-wide">{{ currentLabel }}</label>
       <select
         :value="currentLevel"
         @change="onCurrentChange"
-        class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1.5 text-genshin-text text-sm
+        class="bg-white/60 border border-genshin-detail-border rounded px-2 py-1.5 text-genshin-detail-text text-sm
                focus:outline-none focus:border-genshin-gold cursor-pointer"
       >
         <option v-for="lvl in currentOptions" :key="lvl" :value="lvl">
@@ -76,15 +76,15 @@ function onTargetChange(e) {
     </div>
 
     <!-- Arrow -->
-    <div class="pb-2 text-genshin-muted text-lg">→</div>
+    <div class="pb-2 text-genshin-detail-muted text-lg">→</div>
 
     <!-- Target level dropdown -->
     <div class="flex flex-col gap-1">
-      <label class="text-[11px] text-genshin-muted uppercase tracking-wide">{{ targetLabel }}</label>
+      <label class="text-[11px] text-genshin-detail-muted uppercase tracking-wide">{{ targetLabel }}</label>
       <select
         :value="targetLevel"
         @change="onTargetChange"
-        class="bg-genshin-panel2 border border-genshin-border rounded px-2 py-1.5 text-genshin-text text-sm
+        class="bg-white/60 border border-genshin-detail-border rounded px-2 py-1.5 text-genshin-detail-text text-sm
                focus:outline-none focus:border-genshin-gold cursor-pointer"
       >
         <option

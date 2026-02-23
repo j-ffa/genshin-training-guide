@@ -20,10 +20,11 @@ Allow players to track levelling progress for any number of characters simultane
 
 ## Current State (as of 2026-02-23)
 
-The core app is fully built and working. All five build phases plus a quick-wins sprint are complete, plus artifact substats, completion indicators, and export/import.
+The core app is fully built and working. All five build phases plus a quick-wins sprint are complete, plus artifact substats, completion indicators, export/import, and a full UI refresh.
 
 ### What's done
-- Dark Genshin-themed two-column layout (left: character grid, right: detail panel)
+- **Warm brown/parchment two-column layout** matching in-game Training Guide aesthetic — dark warm-brown left panel with proportional width (38%, 320–520px), parchment-coloured (`#ece5d8`) right detail panel
+- **4-column character grid** with larger 80px portraits, rounded-lg corners, and "Lv. XX" badges at bottom-left
 - Character roster with **ownership toggle mode** — all ~80 characters available (Traveler excluded by design), user marks owned characters, non-owned are hidden when toggle is off
 - **Character search** in ownership mode — search bar filters the grid by name
 - Per-character goal settings persisted to `localStorage`, lazily created on first selection
@@ -31,7 +32,9 @@ The core app is fully built and working. All five build phases plus a quick-wins
 - **Weapon tab** — weapon selector filtered to character's weapon type, weapon icon displayed when selected, ascension costs + Mystic Enhancement Ores
 - **Artifacts tab** — 5 collapsible slots with milestone level dropdowns (+0/+4/+8/+12/+16/+20), Mora + EXP cost per slot + totals. Each slot has **main stat selector** (locked for Flower=HP, Plume=ATK) and **desired substats** with configurable farming strictness (how many of the selected substats the user wants)
 - **Talents tab** — 3 collapsible talent sections with real in-game talent names, independent level ranges 1–10, materials per talent, allows current=target
-- **Green completion indicators** — green dots on tab bar when all goals in a tab are at target, plus individual green dots on talent section headers
+- **Pill-shaped tab bar** — rounded-full tabs with dark active / light inactive styling, always-visible red/green completion dots
+- **Card-style material rows** — larger 44px icons, rounded-lg cards with subtle borders on parchment background
+- **Light-bg form controls** — all dropdowns/selects use `bg-white/60` with `border-genshin-detail-border` in the detail panel
 - **JSON export/import buttons** in the character grid footer — export downloads a JSON backup, import opens a file picker
 - **Character portrait images** from Enka.Network CDN with element-coloured letter fallback
 - **Material icons** from Enka.Network CDN with letter fallback
@@ -40,7 +43,7 @@ The core app is fully built and working. All five build phases plus a quick-wins
 ### What's NOT done yet
 - Cross-character total material summary (aggregate Mora + shared materials across all tracked characters)
 - Material inventory tracking (what the user currently owns) — intentionally deferred
-- Full UI refresh to more closely match in-game Training Guide proportions and colour scheme
+- Mora gold text contrast on parchment detail panel (issue #21)
 
 ## Project Structure
 
@@ -76,6 +79,7 @@ src/
 - **State**: Single `reactive({})` object at module level in `useTrainingGuide.js` — all components share the same instance (Vue's global state pattern without Pinia). `watch(state, ..., { deep: true })` handles all localStorage persistence. State is loaded synchronously at module init (not in `onMounted`) to prevent race conditions with immediate watchers.
 - **genshin-db queries**: All wrapped in `src/data/genshinData.js` with memo caches. Talent costs are at `t.costs.lvl2–lvl10` (shared for all three talents of a character — same books/boss drops regardless of which talent).
 - **Icon CDN**: All game asset icons (characters, weapons, materials) served from Enka.Network (`https://enka.network/ui/{filename_icon}.png`). The MiHoYo CDN URLs in genshin-db are stale for newer content. All icons have `@error` fallbacks to letter placeholders.
+- **Dual colour tokens**: The left panel uses dark tokens (`genshin-panel`, `genshin-text`, `genshin-muted`, `genshin-border`). The right detail panel uses light/parchment tokens (`genshin-detail-bg`, `genshin-detail-text`, `genshin-detail-muted`, `genshin-detail-border`, `genshin-detail-card`). Components inside the detail panel must use `detail-*` variants.
 - **Level tables**: Hardcoded cumulative EXP values in `levelTables.js` for character levels (1→20→40→50→60→70→80→90), weapon levels, and artifact levels. Mora from levelling = EXP × 0.2 for characters, EXP × 0.005 for weapons.
 - **Level selectors**: All use `<select>` dropdowns (not free-text inputs) constrained to valid game milestones. `LevelRangeInput` accepts `currentOptions`, `targetOptions`, optional `currentLabels` for ascension phases, and `allowEqual` for talent sections.
 - **Traveler excluded**: Aether and Lumine are filtered out in `getAllCharacterNames()` — their multi-element talent structure doesn't fit the standard 3-talent model.
@@ -85,7 +89,7 @@ src/
 ## Data & Persistence
 
 - All data stored in `localStorage` under key `genshin-training-guide-v1`
-- JSON export/import functions exist in `useTrainingGuide.js` (`exportData()`, `importData()`) but no UI button yet
+- JSON export/import functions exist in `useTrainingGuide.js` (`exportData()`, `importData()`) with UI buttons in the grid footer
 - Future: potential OCR integration (e.g. Inventory Kamera JSON format) to auto-populate material counts
 
 ## Developer Notes
@@ -95,3 +99,9 @@ src/
 - Prefer simplicity over over-engineering
 - Tailwind v4: custom colours are in `@theme {}` in `style.css` — do NOT create `tailwind.config.js`
 - genshin-db: query characters with `genshindb.characters('names', { matchCategories: true })` for the full list
+
+# Dev Server
+
+http://127.0.0.1:5173/
+- Can use Playwright MCP to view site and monitor progress if it would be beneficial
+

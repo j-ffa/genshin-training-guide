@@ -99,11 +99,11 @@ function handleImport() {
 </script>
 
 <template>
-  <div class="flex flex-col w-56 shrink-0 bg-genshin-panel border-r border-genshin-border h-full">
+  <div class="flex flex-col bg-genshin-panel border-r border-genshin-border h-full">
 
     <!-- Header -->
     <div class="px-3 pt-3 pb-2 border-b border-genshin-border shrink-0">
-      <h1 class="text-genshin-gold text-sm font-semibold tracking-wide">Training Guide</h1>
+      <h1 class="text-genshin-gold text-base font-semibold tracking-wide">Training Guide</h1>
       <p class="text-genshin-muted text-[11px] mt-0.5">
         {{ state.ownershipMode ? 'Click characters to add/remove' : `${state.ownedCharacters.length} characters` }}
       </p>
@@ -121,7 +121,7 @@ function handleImport() {
     </div>
 
     <!-- Character grid — scrollable -->
-    <div class="flex-1 overflow-y-auto p-2">
+    <div class="flex-1 overflow-y-auto p-3">
       <p
         v-if="displayedCharacters.length === 0"
         class="text-genshin-muted text-xs text-center mt-4"
@@ -129,7 +129,7 @@ function handleImport() {
         No characters yet.<br>Click "Edit roster" to add some.
       </p>
 
-      <div class="grid grid-cols-3 gap-1">
+      <div class="grid grid-cols-4 gap-2">
         <CharacterCard
           v-for="name in displayedCharacters"
           :key="name"

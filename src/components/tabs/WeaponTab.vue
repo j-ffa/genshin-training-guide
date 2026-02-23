@@ -113,15 +113,15 @@ const atTarget = computed(() =>
   <div v-if="currentGoal" class="flex flex-col">
 
     <!-- Weapon selector -->
-    <div class="px-5 py-4 border-b border-genshin-border">
-      <label class="block text-[11px] text-genshin-muted uppercase tracking-wide mb-1.5">
+    <div class="px-5 py-4 border-b border-genshin-detail-border">
+      <label class="block text-[11px] text-genshin-detail-muted uppercase tracking-wide mb-1.5">
         Weapon
       </label>
       <div class="flex items-center gap-3">
         <select
           :value="currentGoal.weapon ?? ''"
           @change="setWeapon"
-          class="flex-1 bg-genshin-panel2 border border-genshin-border rounded px-3 py-2 text-genshin-text text-sm
+          class="flex-1 bg-white/60 border border-genshin-detail-border rounded px-3 py-2 text-genshin-detail-text text-sm
                  focus:outline-none focus:border-genshin-gold cursor-pointer"
         >
           <option value="">— Select a weapon —</option>
@@ -150,13 +150,13 @@ const atTarget = computed(() =>
         @update:target-level="setWeaponTargetLevel"
       />
 
-      <div v-if="atTarget" class="p-5 text-genshin-muted text-sm">
+      <div v-if="atTarget" class="p-5 text-genshin-detail-muted text-sm">
         Already at target level.
       </div>
 
       <div v-else>
         <div class="px-4 pt-3 pb-1">
-          <p class="text-[11px] text-genshin-muted uppercase tracking-wide">
+          <p class="text-[11px] text-genshin-detail-muted uppercase tracking-wide">
             Materials needed (Lv. {{ currentGoal.weaponCurrentLevel }} → {{ currentGoal.weaponTargetLevel }})
           </p>
         </div>

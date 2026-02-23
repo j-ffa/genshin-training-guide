@@ -15,27 +15,29 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const TABS = [
-  { id: 'characterLevel', label: 'Character Level', icon: '⚔️' },
-  { id: 'weapon',         label: 'Weapon',           icon: '🗡️' },
-  { id: 'artifacts',      label: 'Artifacts',         icon: '🔮' },
-  { id: 'talents',        label: 'Talents',           icon: '✨' },
+  { id: 'characterLevel', label: 'Character Level' },
+  { id: 'weapon',         label: 'Weapon' },
+  { id: 'artifacts',      label: 'Artifacts' },
+  { id: 'talents',        label: 'Talents' },
 ]
 </script>
 
 <template>
-  <div class="flex border-b border-genshin-border shrink-0">
+  <div class="flex items-center gap-2 px-6 py-3 border-b border-genshin-detail-border shrink-0">
     <button
       v-for="tab in TABS"
       :key="tab.id"
       @click="emit('update:modelValue', tab.id)"
-      class="flex items-center gap-1.5 px-4 py-3 text-xs font-medium transition-colors duration-150 border-b-2 cursor-pointer whitespace-nowrap"
+      class="flex items-center gap-1.5 px-4 py-2 text-xs font-medium transition-colors duration-150 rounded-full cursor-pointer whitespace-nowrap"
       :class="modelValue === tab.id
-        ? 'border-genshin-gold text-genshin-gold'
-        : 'border-transparent text-genshin-muted hover:text-genshin-text'"
+        ? 'bg-genshin-panel text-genshin-text'
+        : 'bg-genshin-detail-card text-genshin-detail-muted hover:bg-genshin-detail-card/70'"
     >
-      <span>{{ tab.icon }}</span>
       <span>{{ tab.label }}</span>
-      <span v-if="completionStatus[tab.id]" class="w-1.5 h-1.5 rounded-full bg-genshin-green shrink-0" title="Complete"></span>
+      <span
+        class="w-1.5 h-1.5 rounded-full shrink-0"
+        :class="completionStatus[tab.id] ? 'bg-genshin-green' : 'bg-genshin-red'"
+      ></span>
     </button>
   </div>
 </template>

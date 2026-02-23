@@ -21,11 +21,11 @@ const imgFailed = ref(false)
 </script>
 
 <template>
-  <div class="flex items-center gap-3 py-2 px-4 border-b border-genshin-border/50 last:border-0">
+  <div class="flex items-center gap-3 py-2 px-4 mx-4 my-1 bg-genshin-detail-card/60 border border-genshin-detail-border/50 rounded-lg">
     <!-- Icon: CDN image with fallback to letter placeholder -->
     <div
-      class="w-8 h-8 rounded shrink-0 flex items-center justify-center text-xs font-bold overflow-hidden"
-      :class="isMora ? 'bg-genshin-gold/20 text-genshin-gold' : 'bg-genshin-border/50 text-genshin-muted'"
+      class="w-11 h-11 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold overflow-hidden"
+      :class="isMora ? 'bg-genshin-gold/20 text-genshin-gold' : 'bg-genshin-detail-border/50 text-genshin-detail-muted'"
     >
       <img
         v-if="iconUrl && !imgFailed"
@@ -39,12 +39,12 @@ const imgFailed = ref(false)
     </div>
 
     <!-- Material name -->
-    <span class="flex-1 text-sm text-genshin-text min-w-0 truncate">{{ name }}</span>
+    <span class="flex-1 text-sm text-genshin-detail-text min-w-0 truncate">{{ name }}</span>
 
     <!-- Count (right-aligned) -->
     <span
       class="text-sm font-semibold shrink-0"
-      :class="isMora ? 'text-genshin-gold' : 'text-genshin-text'"
+      :class="isMora ? 'text-genshin-gold' : 'text-genshin-detail-text'"
     >
       × {{ count.toLocaleString() }}
     </span>
