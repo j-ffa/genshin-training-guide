@@ -10,6 +10,7 @@
  */
 
 import { reactive, computed, watch } from 'vue'
+import { getAllCharacterNames } from '../data/genshinData.js'
 
 // ──────────────────────────────────────────────────────────
 // Constants
@@ -171,6 +172,104 @@ function updateGoal(charName, patchOrFn) {
 }
 
 // ──────────────────────────────────────────────────────────
+// Import validation
+// ──────────────────────────────────────────────────────────
+
+const VALID_CHAR_NAMES = new Set(getAllCharacterNames())
+const VALID_SLOTS = ['Flower', 'Plume', 'Sands', 'Goblet', 'Circlet']
+const VALID_TALENT_KEYS = ['normalAttack', 'skill', 'burst']
+
+/**
+ * Validates parsed import data and returns an array of error strings.
+ * Empty array = valid data.
+ */
+function validateImportData(data) {
+  const errors = []
+
+  if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+    return ['Import data must be a JSON object']
+  }
+
+  // ownedCharacters
+  if (data.ownedCharacters !== undefined) {
+    if (!Array.isArray(data.ownedCharacters)) {
+      errors.push('ownedCharacters must be an array')
+    } else {
+      for (const name of data.ownedCharacters) {
+        if (typeof name !== 'string') {
+          errors.push(`ownedCharacters contains non-string value: ${JSON.stringify(name)}`)
+        } else if (!VALID_CHAR_NAMES.has(name)) {
+          errors.push(`Unknown character in ownedCharacters: "${name}"`)
+        }
+      }
+    }
+  }
+
+  // selectedCharacter
+  if (data.selectedCharacter !== undefined && data.selectedCharacter !== null) {
+    if (typeof data.selectedCharacter !== 'string' || !VALID_CHAR_NAMES.has(data.selectedCharacter)) {
+      errors.push(`Invalid selectedCharacter: "${data.selectedCharacter}"`)
+    }
+  }
+
+  // characterGoals
+  if (data.characterGoals !== undefined) {
+    if (typeof data.characterGoals !== 'object' || data.characterGoals === null || Array.isArray(data.characterGoals)) {
+      errors.push('characterGoals must be an object')
+    } else {
+      for (const [charName, goal] of Object.entries(data.characterGoals)) {
+        if (!VALID_CHAR_NAMES.has(charName)) {
+          errors.push(`Unknown character in goals: "${charName}"`)
+          continue
+        }
+        if (typeof goal !== 'object' || goal === null) {
+          errors.push(`Goal for "${charName}" is not an object`)
+          continue
+        }
+
+        // Check level values
+        if (!VALID_CHARACTER_LEVELS.includes(goal.currentLevel) && goal.currentLevel !== 1) {
+          errors.push(`"${charName}" has invalid currentLevel: ${goal.currentLevel}`)
+        }
+        if (!VALID_CHARACTER_LEVELS.includes(goal.targetLevel) && goal.targetLevel !== 1) {
+          errors.push(`"${charName}" has invalid targetLevel: ${goal.targetLevel}`)
+        }
+
+        // Artifacts
+        if (goal.artifacts !== undefined) {
+          if (!Array.isArray(goal.artifacts) || goal.artifacts.length !== 5) {
+            errors.push(`"${charName}" artifacts must be an array of 5`)
+          } else {
+            for (let i = 0; i < 5; i++) {
+              const a = goal.artifacts[i]
+              if (!a || a.slot !== VALID_SLOTS[i]) {
+                errors.push(`"${charName}" artifact[${i}] has wrong slot (expected "${VALID_SLOTS[i]}")`)
+              }
+            }
+          }
+        }
+
+        // Talents
+        if (goal.talents !== undefined) {
+          if (typeof goal.talents !== 'object' || goal.talents === null) {
+            errors.push(`"${charName}" talents must be an object`)
+          } else {
+            for (const key of VALID_TALENT_KEYS) {
+              const t = goal.talents[key]
+              if (t && (t.currentLevel < 1 || t.currentLevel > 10 || t.targetLevel < 1 || t.targetLevel > 10)) {
+                errors.push(`"${charName}" talent "${key}" has out-of-range levels`)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return errors
+}
+
+// ──────────────────────────────────────────────────────────
 // Export / Import
 // ──────────────────────────────────────────────────────────
 
@@ -188,12 +287,22 @@ function exportData() {
 function importData(jsonString) {
   try {
     const parsed = JSON.parse(jsonString)
+
+    // Validate before applying
+    const errors = validateImportData(parsed)
+    if (errors.length > 0) {
+      const shown = errors.slice(0, 5).join('\n• ')
+      const suffix = errors.length > 5 ? `\n…and ${errors.length - 5} more` : ''
+      alert(`Import rejected — data has errors:\n\n• ${shown}${suffix}`)
+      return
+    }
+
     if (Array.isArray(parsed.ownedCharacters)) state.ownedCharacters = parsed.ownedCharacters
     if (parsed.characterGoals)                 state.characterGoals  = parsed.characterGoals
-    if (parsed.selectedCharacter)              state.selectedCharacter = parsed.selectedCharacter
+    if (parsed.selectedCharacter !== undefined) state.selectedCharacter = parsed.selectedCharacter
   } catch (e) {
     console.error('Failed to import data:', e)
-    alert('Import failed — the file does not appear to be valid training guide data.')
+    alert('Import failed — the file does not appear to be valid JSON.')
   }
 }
 
