@@ -163,7 +163,7 @@ function slotSummary(artifact) {
     <div class="flex items-center justify-between px-5 py-3 border-b border-genshin-detail-border bg-genshin-detail-card/50">
       <span class="text-[11px] text-genshin-detail-muted uppercase tracking-wide">Total (artifacts)</span>
       <div class="text-right">
-        <span class="text-genshin-gold font-semibold text-sm">{{ totalMora.toLocaleString() }} Mora</span>
+        <span class="text-genshin-detail-gold font-semibold text-sm">{{ totalMora.toLocaleString() }} Mora</span>
         <span class="block text-genshin-detail-muted text-[11px]">{{ totalXp.toLocaleString() }} EXP</span>
       </div>
     </div>
@@ -201,7 +201,7 @@ function slotSummary(artifact) {
         <!-- Mora + XP cost -->
         <div class="ml-auto text-right shrink-0">
           <template v-if="slotMora(artifact) > 0">
-            <span class="text-genshin-gold text-xs font-medium">
+            <span class="text-genshin-detail-gold text-xs font-medium">
               {{ slotMora(artifact).toLocaleString() }} Mora
             </span>
           </template>
@@ -297,7 +297,7 @@ function slotSummary(artifact) {
               @click.stop="toggleSubstat(idx, stat)"
               class="px-2 py-0.5 rounded text-[11px] border transition-colors cursor-pointer"
               :class="(artifact.desiredSubstats ?? []).includes(stat)
-                ? 'bg-genshin-gold/20 border-genshin-gold text-genshin-gold'
+                ? 'bg-genshin-detail-gold/20 border-genshin-detail-gold text-genshin-detail-gold'
                 : 'bg-white/60 border-genshin-detail-border text-genshin-detail-muted hover:border-genshin-gold/50'"
             >
               {{ stat }}

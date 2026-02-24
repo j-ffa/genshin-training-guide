@@ -25,7 +25,7 @@ const imgFailed = ref(false)
     <!-- Icon: CDN image with fallback to letter placeholder -->
     <div
       class="w-11 h-11 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold overflow-hidden"
-      :class="isMora ? 'bg-genshin-gold/20 text-genshin-gold' : 'bg-genshin-detail-border/50 text-genshin-detail-muted'"
+      :class="isMora ? 'bg-genshin-detail-gold/20 text-genshin-detail-gold' : 'bg-genshin-detail-border/50 text-genshin-detail-muted'"
     >
       <img
         v-if="iconUrl && !imgFailed"
@@ -44,7 +44,7 @@ const imgFailed = ref(false)
     <!-- Count (right-aligned) -->
     <span
       class="text-sm font-semibold shrink-0"
-      :class="isMora ? 'text-genshin-gold' : 'text-genshin-detail-text'"
+      :class="isMora ? 'text-genshin-detail-gold' : 'text-genshin-detail-text'"
     >
       × {{ count.toLocaleString() }}
     </span>
