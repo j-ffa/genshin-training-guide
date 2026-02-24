@@ -16,7 +16,7 @@
  * ownership mode so the user can build their roster straight away.
  */
 
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useTrainingGuide } from '../composables/useTrainingGuide.js'
 import { getAllCharacterNames, getCharacterIconUrl } from '../data/genshinData.js'
 import genshindb from 'genshin-db'
@@ -45,10 +45,16 @@ watch(() => state.ownershipMode, (isOn) => {
   if (!isOn) searchQuery.value = ''
 })
 
-// If no characters are owned yet (first launch), auto-enter ownership mode
+// If no characters are owned yet (first launch), auto-enter ownership mode.
+// Use onMounted (fires once after state has loaded) instead of immediate watcher
+// to avoid flashing the ownership UI on reload before reactive state settles.
+onMounted(() => {
+  if (state.ownedCharacters.length === 0) state.ownershipMode = true
+})
+// Also catch the edge case where user removes all characters after app is running
 watch(() => state.ownedCharacters.length, (len) => {
   if (len === 0) state.ownershipMode = true
-}, { immediate: true })
+})
 
 /**
  * Characters to display in the grid:
