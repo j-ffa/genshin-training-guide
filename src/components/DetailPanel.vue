@@ -19,6 +19,7 @@ import CharacterLevelTab from './tabs/CharacterLevelTab.vue'
 import WeaponTab from './tabs/WeaponTab.vue'
 import ArtifactsTab from './tabs/ArtifactsTab.vue'
 import TalentsTab from './tabs/TalentsTab.vue'
+import MaterialSummary from './MaterialSummary.vue'
 
 const { state, currentGoal } = useTrainingGuide()
 
@@ -55,18 +56,8 @@ const tabCompletion = computed(() => {
 </script>
 
 <template>
-  <!-- No character selected -->
-  <div
-    v-if="!state.selectedCharacter"
-    class="flex items-center justify-center h-full bg-genshin-detail-bg"
-  >
-    <p class="text-genshin-detail-muted text-sm text-center leading-relaxed">
-      Select a character<br>
-      <span class="text-xs opacity-70">
-        {{ state.ownershipMode ? 'Exit roster edit mode first' : 'from the list on the left' }}
-      </span>
-    </p>
-  </div>
+  <!-- No character selected — show aggregated material summary -->
+  <MaterialSummary v-if="!state.selectedCharacter" />
 
   <!-- Character selected -->
   <div v-else class="flex flex-col h-full bg-genshin-detail-bg text-genshin-detail-text">

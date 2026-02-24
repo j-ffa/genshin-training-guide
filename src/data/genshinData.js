@@ -40,7 +40,7 @@ const _talentCache = {}
  * Merge one cost item { name, count } into an accumulator array,
  * summing counts for items with the same name.
  */
-function mergeCosts(accumulator, items) {
+export function mergeCosts(accumulator, items) {
   for (const item of items) {
     const existing = accumulator.find(c => c.name === item.name)
     if (existing) {
@@ -143,6 +143,11 @@ function getWeapon(weaponName) {
 /** Returns the internal weapon type string (e.g. "WEAPON_POLE") for a weapon. */
 export function getWeaponType(weaponName) {
   return getWeapon(weaponName)?.weaponType ?? null
+}
+
+/** Returns the star rarity (3, 4, or 5) for a weapon. Defaults to 5 if unknown. */
+export function getWeaponRarity(weaponName) {
+  return getWeapon(weaponName)?.rarity ?? 5
 }
 
 /**

@@ -10,7 +10,16 @@
  */
 
 import { reactive, computed, watch } from 'vue'
-import { getAllCharacterNames } from '../data/genshinData.js'
+import {
+  getAllCharacterNames,
+  getCharacterAscensionCosts,
+  getWeaponAscensionCosts,
+  getWeaponRarity,
+  getTalentCosts,
+  getMaterialIconUrl,
+  mergeCosts,
+} from '../data/genshinData.js'
+import { getCharacterLevelUpCosts, getWeaponLevelUpCosts, getArtifactLevelCost, getArtifactXpCost } from '../data/levelTables.js'
 
 // ──────────────────────────────────────────────────────────
 // Constants
@@ -315,6 +324,71 @@ const currentGoal = computed(() =>
   state.selectedCharacter ? state.characterGoals[state.selectedCharacter] : null
 )
 
+/**
+ * Aggregated materials across all owned characters with goals.
+ * Returns an array of { name, count, iconUrl, isMora } sorted with Mora first, then by count desc.
+ */
+const totalMaterials = computed(() => {
+  const costs = []
+
+  for (const charName of state.ownedCharacters) {
+    const goal = state.characterGoals[charName]
+    if (!goal) continue
+
+    // Character levelling (Mora + Hero's Wits + ascension materials)
+    if (goal.currentLevel < goal.targetLevel) {
+      const levelUp = getCharacterLevelUpCosts(goal.currentLevel, goal.targetLevel)
+      if (levelUp.mora > 0) mergeCosts(costs, [{ name: 'Mora', count: levelUp.mora }])
+      if (levelUp.heroWits > 0) mergeCosts(costs, [{ name: "Hero's Wit", count: levelUp.heroWits }])
+
+      const ascensionCosts = getCharacterAscensionCosts(charName, goal.currentLevel, goal.targetLevel)
+      mergeCosts(costs, ascensionCosts)
+    }
+
+    // Weapon levelling
+    if (goal.weapon && goal.weaponCurrentLevel < goal.weaponTargetLevel) {
+      const rarity = getWeaponRarity(goal.weapon)
+      const weaponUp = getWeaponLevelUpCosts(goal.weaponCurrentLevel, goal.weaponTargetLevel, rarity)
+      if (weaponUp.mora > 0) mergeCosts(costs, [{ name: 'Mora', count: weaponUp.mora }])
+      if (weaponUp.mysticOres > 0) mergeCosts(costs, [{ name: 'Mystic Enhancement Ore', count: weaponUp.mysticOres }])
+
+      const weaponAscCosts = getWeaponAscensionCosts(goal.weapon, goal.weaponCurrentLevel, goal.weaponTargetLevel)
+      mergeCosts(costs, weaponAscCosts)
+    }
+
+    // Artifacts (Mora only — XP is fodder-based, not a distinct material)
+    for (const artifact of goal.artifacts) {
+      if (artifact.currentLevel < artifact.targetLevel) {
+        const mora = getArtifactLevelCost(artifact.currentLevel, artifact.targetLevel)
+        if (mora > 0) mergeCosts(costs, [{ name: 'Mora', count: mora }])
+      }
+    }
+
+    // Talents
+    for (const key of ['normalAttack', 'skill', 'burst']) {
+      const t = goal.talents[key]
+      if (t && t.currentLevel < t.targetLevel) {
+        const talentCosts = getTalentCosts(charName, t.currentLevel, t.targetLevel)
+        mergeCosts(costs, talentCosts)
+      }
+    }
+  }
+
+  // Sort: Mora first, then by count descending
+  costs.sort((a, b) => {
+    if (a.name === 'Mora') return -1
+    if (b.name === 'Mora') return 1
+    return b.count - a.count
+  })
+
+  // Add icon URLs and isMora flag
+  return costs.map(c => ({
+    ...c,
+    iconUrl: getMaterialIconUrl(c.name),
+    isMora: c.name === 'Mora',
+  }))
+})
+
 // ──────────────────────────────────────────────────────────
 // Public API
 // ──────────────────────────────────────────────────────────
@@ -323,6 +397,7 @@ export function useTrainingGuide() {
   return {
     state,
     currentGoal,
+    totalMaterials,
     loadFromStorage,
     selectCharacter,
     toggleOwnership,
