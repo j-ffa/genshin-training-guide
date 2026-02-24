@@ -11,6 +11,20 @@
 import genshindb from 'genshin-db'
 
 // ──────────────────────────────────────────────────────────
+// Element colour map (game-accurate brand colours)
+// ──────────────────────────────────────────────────────────
+
+export const ELEMENT_COLOURS = {
+  ELEMENT_PYRO:    '#e05c4b',
+  ELEMENT_HYDRO:   '#2e96c7',
+  ELEMENT_ANEMO:   '#4ec0a1',
+  ELEMENT_ELECTRO: '#9a5ec7',
+  ELEMENT_DENDRO:  '#6eb04e',
+  ELEMENT_CRYO:    '#7ec7d4',
+  ELEMENT_GEO:     '#c89b3c',
+}
+
+// ──────────────────────────────────────────────────────────
 // Memo caches — populated on first call, reused thereafter
 // ──────────────────────────────────────────────────────────
 

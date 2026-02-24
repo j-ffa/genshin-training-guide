@@ -14,6 +14,7 @@
  */
 
 import { ref } from 'vue'
+import { ELEMENT_COLOURS } from '../data/genshinData.js'
 
 const props = defineProps({
   name:       { type: String,  required: true },
@@ -26,19 +27,6 @@ const props = defineProps({
 
 // Falls back to letter placeholder if image fails to load
 const imgFailed = ref(false)
-
-// Map genshin-db's internal element codes to Tailwind bg colours.
-// Using inline style for the exact game colours rather than theme tokens,
-// since elements have very specific brand colours.
-const ELEMENT_COLOURS = {
-  ELEMENT_PYRO:    '#e05c4b',
-  ELEMENT_HYDRO:   '#2e96c7',
-  ELEMENT_ANEMO:   '#4ec0a1',
-  ELEMENT_ELECTRO: '#9a5ec7',
-  ELEMENT_DENDRO:  '#6eb04e',
-  ELEMENT_CRYO:    '#7ec7d4',
-  ELEMENT_GEO:     '#c89b3c',
-}
 
 const elementColour = props.element ? (ELEMENT_COLOURS[props.element] ?? '#5a6478') : '#5a6478'
 </script>
